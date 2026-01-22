@@ -6,13 +6,8 @@ import threading
 import time
 
 def run_django():
-    """Runs the Django backend server."""
+    """Run Django backend server."""
     print("[Backend] Starting Django Server at http://127.0.0.1:8000...")
-    # Assume venv is active or we are running in a venv environment
-    # Use 'python' directly as we expect this script to be run via the desired python interpreter
-    # OR we explicitly call the venv python if needed. 
-    # For now, we assume the user runs `python run_project.py`
-    
     cmd = [sys.executable, "manage.py", "runserver"]
     cwd = os.path.join(os.getcwd(), "backend")
     
@@ -22,19 +17,18 @@ def run_django():
         print("\n[Backend] Stopping Django Server...")
 
 def run_react():
-    """Runs the React frontend server."""
+    """Run React frontend server."""
     print("[Frontend] Starting Vite Server at http://localhost:5173...")
-    
-    # Use cmd /c for Windows to avoid PowerShell execution policy issues
     cwd = os.path.join(os.getcwd(), "frontend")
     
     try:
+        # Use cmd /c for Windows PowerShell compatibility
         subprocess.run("cmd /c npm run dev", cwd=cwd, shell=True, check=True)
     except KeyboardInterrupt:
         print("\n[Frontend] Stopping Vite Server...")
 
 def open_browser():
-    """Opens the browser after a short delay."""
+    """Open browser after delay."""
     time.sleep(5)
     print("\n[System] Opening Browser...")
     webbrowser.open("http://localhost:5173")
@@ -56,17 +50,16 @@ def main():
     print("=" * 70)
     print()
     
-    # Check if we are in the right directory
+    # Verify project directory structure
     if not os.path.exists("backend") or not os.path.exists("frontend"):
-        print("[ERROR] Please run this script from the project root (Research_Search_Engine).")
+        print("[ERROR] Please run this script from the project root directory.")
         return
 
-    # Create threads
+    # Create and start threads
     t_backend = threading.Thread(target=run_django)
     t_frontend = threading.Thread(target=run_react)
     t_browser = threading.Thread(target=open_browser)
     
-    # Start threads
     t_backend.start()
     t_frontend.start()
     t_browser.start()
@@ -74,14 +67,10 @@ def main():
     print("\n[System] Servers are starting... Press Ctrl+C to stop.")
     
     try:
-        # Keep main thread alive
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
         print("\n[System] Shutting down...")
-        # Threads are daemon=False by default, so they might persist unless killed.
-        # However, subprocesses usually die with the shell.
-        # In a real production script we'd handle signals better.
         os._exit(0)
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 """
-Test script for Task 2 Classification API
-Tests all endpoints and demonstrates robustness
+Task 2: API Tests
+Test all Document Classification API endpoints.
 """
 import requests
 import json
@@ -8,9 +8,9 @@ import json
 BASE_URL = 'http://localhost:8000/api/classification'
 
 def test_predict():
-    """Test document prediction endpoint"""
+    """Test prediction endpoint"""
     print("=" * 60)
-    print("TESTING PREDICTION ENDPOINT")
+    print("TESTING PREDICTION")
     print("=" * 60)
     
     test_cases = [
@@ -52,7 +52,7 @@ def test_predict():
 
 def test_statistics():
     """Test statistics endpoint"""
-    print("\nTESTING STATISTICS ENDPOINT")
+    print("\nTESTING STATISTICS")
     print("=" * 60)
     
     try:
@@ -79,7 +79,7 @@ def test_statistics():
 
 def test_samples():
     """Test sample documents endpoint"""
-    print("\nTESTING SAMPLE DOCUMENTS ENDPOINT")
+    print("\nTESTING SAMPLE DOCUMENTS")
     print("=" * 60)
     
     categories = ['Business', 'Entertainment', 'Health']
@@ -101,7 +101,7 @@ def test_samples():
 
 if __name__ == '__main__':
     print("\n" + "=" * 60)
-    print("TASK 2: DOCUMENT CLASSIFICATION API TESTS")
+    print("TASK 2: API TESTS")
     print("=" * 60)
     print("Make sure the backend server is running on http://localhost:8000")
     print("=" * 60 + "\n")

@@ -1,12 +1,12 @@
 """
-Task 2: Document Classification - Main Entry Point
-Runs training for the Naive Bayes classifier (saves models and metrics).
+Task 2: Document Classification
+Train Naive Bayes classifier and test robustness.
 """
 import os
 import sys
 import django
 
-# 1. Setup Django Environment (so classification service uses project paths)
+# Setup Django environment
 current_dir = os.path.dirname(os.path.abspath(__file__))
 backend_dir = os.path.join(current_dir, 'backend')
 sys.path.append(backend_dir)
@@ -18,21 +18,26 @@ from classification.classification_service import get_classification_service
 
 
 def main():
-    print("========================================")
-    print("   TASK 2: DOCUMENT CLASSIFICATION")
-    print("========================================")
+    print("=" * 40)
+    print("TASK 2: DOCUMENT CLASSIFICATION")
+    print("=" * 40)
 
     service = get_classification_service()
 
-    print("[1/1] Training classifier on real-world data from data.py...")
-    res = service.train()  # Will use documents from data.py
+    # Train classifier
+    print("[1/1] Training classifier on real-world data...")
+    res = service.train()
     if res is None:
         print("[ERROR] Training failed. See logs for details.")
     else:
         print("[OK] Training completed. Metrics:")
         print(res)
 
-    print("\n========== ROBUSTNESS TESTING ==========")
+    # Test robustness with varied inputs
+    print("\n" + "=" * 40)
+    print("ROBUSTNESS TESTING")
+    print("=" * 40)
+    
     robust_tests = [
         "movie music actor",
         "THE ECONOMY AND THE MARKET",
@@ -48,7 +53,7 @@ def main():
         print(f"Prediction: {pred['category']} (Conf: {pred['confidence']:.4f})")
         print("-" * 60)
 
-    print("\n[DONE] Task 2 Document Classification Complete")
+    print("\n[DONE] Task 2 Complete")
 
 if __name__ == '__main__':
     main()

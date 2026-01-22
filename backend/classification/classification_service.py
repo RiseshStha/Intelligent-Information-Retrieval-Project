@@ -1,7 +1,6 @@
 """
-Document Classification Service (Supervised)
-Implements a Multinomial Naive Bayes classifier with TF-IDF features.
-Provides training, prediction, metrics and sample document retrieval.
+Document Classification Service
+Multinomial Naive Bayes classifier with TF-IDF features.
 """
 import os
 import pickle
@@ -16,18 +15,17 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score, classification_report
 
-# Import real-world documents from data.py
+# Import documents from data.py
 try:
     import sys
     from pathlib import Path
-    # Add parent directory to path to import data.py
     parent_dir = Path(__file__).resolve().parent.parent.parent
     if str(parent_dir) not in sys.path:
         sys.path.insert(0, str(parent_dir))
     from data import documents
-    print(f"[ClassificationService] Loaded {len(documents)} real-world documents from data.py")
+    print(f"[Classification] Loaded {len(documents)} documents from data.py")
 except ImportError:
-    print("[ClassificationService] Warning: Could not import documents from data.py, using empty list")
+    print("[Classification] Warning: Could not import data.py")
     documents = []
 
 
@@ -46,7 +44,6 @@ class ClassificationService:
         self.model = None
         self.label_classes = []
 
-        # try to load saved artifacts
         self.load_models()
 
     def _preprocess(self, text: str) -> str:
@@ -70,7 +67,7 @@ class ClassificationService:
                 return True
             return False
         except Exception as e:
-            print(f"[ClassificationService] Error loading models: {e}")
+            print(f"[Classification] Error loading models: {e}")
             return False
 
     def train_from_dataframe(self, df: pd.DataFrame, text_col='text', label_col='category'):
@@ -91,7 +88,7 @@ class ClassificationService:
         self.model = MultinomialNB()
         self.model.fit(X_train_vec, y_train)
 
-        # persist
+        # Save models
         with open(self.models_dir / 'tfidf_vectorizer.pkl', 'wb') as f:
             pickle.dump(self.vectorizer, f)
         with open(self.models_dir / 'nb_classifier.pkl', 'wb') as f:
@@ -99,7 +96,7 @@ class ClassificationService:
 
         self.label_classes = list(self.model.classes_)
 
-        # evaluation
+        # Evaluate model
         y_pred = self.model.predict(X_test_vec)
         acc = accuracy_score(y_test, y_pred)
         report = classification_report(y_test, y_pred, output_dict=True)
@@ -108,7 +105,7 @@ class ClassificationService:
         with open(self.data_dir / 'classification_metrics.json', 'w') as f:
             json.dump(metrics, f, indent=2)
 
-        # save classified documents for browsing
+        # Save predictions
         df_out = df.copy()
         df_out['predicted_category'] = self.model.predict(self.vectorizer.transform(df_out['clean_text']))
         df_out.to_csv(self.data_dir / 'classified_documents.csv', index=False)
@@ -116,7 +113,7 @@ class ClassificationService:
         return metrics
 
     def train(self, dataset_path: str = None):
-        # dataset_path relative to base_dir/data or absolute
+
         try:
             if dataset_path:
                 p = Path(dataset_path)
@@ -128,13 +125,13 @@ class ClassificationService:
             else:
                 raise FileNotFoundError('No dataset provided and no embedded documents available')
 
-            # expect columns 'text' and 'category'
+            # Validate columns
             if 'text' not in df.columns or 'category' not in df.columns:
                 raise ValueError('Dataset must contain "text" and "category" columns')
 
             return self.train_from_dataframe(df, text_col='text', label_col='category')
         except Exception as e:
-            print(f"[ClassificationService] Training failed: {e}")
+            print(f"[Classification] Training failed: {e}")
             return None
 
     def predict(self, text: str):
@@ -181,7 +178,7 @@ class ClassificationService:
             return []
 
 
-# singleton
+# Singleton instance
 _service = None
 
 def get_classification_service():

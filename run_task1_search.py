@@ -1,16 +1,7 @@
 """
-Task 1: Search Engine - Standalone Script
-Converted from 'Proper Assignment.ipynb'
-
-Usage:
-    python run_task1_search.py
-
-This script allows you to:
-1. Crawl the target website
-2. Build the Inverted Index
-3. Search for documents
+Task 1: Search Engine
+Crawl, index, and search publications.
 """
-
 import webbrowser
 import requests
 import time
@@ -25,7 +16,7 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 
-# Try importing Selenium for better visual mode
+# Try importing Selenium for visual mode
 try:
     from selenium import webdriver
     from selenium.webdriver.chrome.options import Options
@@ -33,9 +24,7 @@ try:
 except ImportError:
     SELENIUM_AVAILABLE = False
 
-# ==========================================
-# CONFIGURATION
-# ==========================================
+# Configuration
 SEED_URL = "https://pureportal.coventry.ac.uk/en/organisations/ics-research-centre-for-computational-science-and-mathematical-mo"
 BASE_DOMAIN = "pureportal.coventry.ac.uk"
 CRAWL_DELAY = 5 
@@ -49,9 +38,7 @@ def setup_nltk():
         print("Downloading NLTK stopwords...")
         nltk.download('stopwords', quiet=True)
 
-# ==========================================
-# CRAWLER COMPONENTS
-# ==========================================
+# Crawler Components
 def is_allowed_url(url: str) -> bool:
     """Manual robots.txt compliance"""
     if "format=rss" in url: return False
@@ -163,9 +150,7 @@ def crawl_website(max_pages=MAX_PAGES, visual_mode=False):
     print("     Saved to 'publications.json'")
     return publications
 
-# ==========================================
-# INDEXER COMPONENTS
-# ==========================================
+# Indexer Components
 def preprocess(text, stemmer, stop_words):
     text = text.lower()
     tokens = re.findall(r"\b[a-z]+\b", text)
@@ -216,9 +201,7 @@ def build_index():
     
     return inverted_index, doc_lengths
 
-# ==========================================
-# SEARCH COMPONENTS
-# ==========================================
+# Search Components
 def search_engine(query, top_k=5):
     # Load Data
     try:
@@ -262,9 +245,7 @@ def search_engine(query, top_k=5):
     
     return ranked_docs, documents
 
-# ==========================================
-# MAIN MENU
-# ==========================================
+# Main Menu
 def main():
     setup_nltk()
     

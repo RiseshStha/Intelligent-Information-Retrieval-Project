@@ -22,59 +22,54 @@ def install_pip_requirements(requirements_file):
         print(f"       [WARNING] {requirements_file} not found.")
 
 def main():
-    print("===================================================")
-    print("   Project Setup Script (Python Version)")
-    print("===================================================")
+    print("=" * 50)
+    print("Project Setup Script")
+    print("=" * 50)
     
-    # 1. Check Prerequisites
+    # Check Prerequisites
     print_step("1/5", "Checking Prerequisites...")
     if not check_command("python --version", "Python"): return
-    if not check_command("npm --version", "Node.js"): return
+    if not check_command("cmd /c npm --version", "Node.js"): return
     
-    # 2. Install Backend Dependencies
+    # Install Backend Dependencies
     print_step("2/5", "Installing Backend Dependencies...")
     install_pip_requirements(os.path.join("backend", "requirements.txt"))
     
-    # 3. Install Frontend Dependencies
+    # Install Frontend Dependencies
     print_step("3/5", "Installing Frontend Dependencies...")
     frontend_dir = os.path.join(os.getcwd(), "frontend")
     if os.path.exists(frontend_dir):
-        subprocess.check_call("npm install", cwd=frontend_dir, shell=True)
+        # Use cmd /c for Windows compatibility
+        subprocess.check_call("cmd /c npm install", cwd=frontend_dir, shell=True)
     else:
         print("[ERROR] Frontend directory not found!")
         return
 
-    # 4. Generate Machine Learning Models (Task 2)
-    print_step("4/5", "Checking/Generating AI Models...")
+    # Generate Machine Learning Models
+    print_step("4/5", "Checking Models...")
     model_path = os.path.join("backend", "models", "nb_classifier.pkl")
     if not os.path.exists(model_path):
-        print("       Running 'run_task2_classification.py' to produce models...")
+        print("       Running training script...")
         try:
             subprocess.check_call([sys.executable, "run_task2_classification.py"])
         except subprocess.CalledProcessError:
-            print("[ERROR] Failed to run classification training script.")
+            print("[ERROR] Training failed.")
             return
     else:
-        print("       Models already exist. Skipping generation.")
+        print("       Models exist. Skipping.")
 
-    # 5. Database Setup
+    # Database Setup
     print_step("5/5", "Setting up Database...")
     backend_dir = os.path.join(os.getcwd(), "backend")
     
-    # Migrations
     subprocess.check_call([sys.executable, "manage.py", "makemigrations"], cwd=backend_dir)
     subprocess.check_call([sys.executable, "manage.py", "migrate"], cwd=backend_dir)
     
-    # Populate Data
-    # No automatic DB population for classification by default
-    print("       Skipping DB population for classification (no populator found).")
-    
-    print("\n===================================================")
-    print("   SETUP COMPLETE! ")
-    print("===================================================")
-    print("You can now run the project using:")
-    print(f"   python run_project.py")
-    print("===================================================")
+    print("\n" + "=" * 50)
+    print("SETUP COMPLETE")
+    print("=" * 50)
+    print("Run: python run_project.py")
+    print("=" * 50)
 
 if __name__ == "__main__":
     main()
