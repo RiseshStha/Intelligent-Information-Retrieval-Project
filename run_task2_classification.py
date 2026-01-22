@@ -30,8 +30,31 @@ def main():
     if res is None:
         print("[ERROR] Training failed. See logs for details.")
     else:
-        print("[OK] Training completed. Metrics:")
-        print(res)
+        print("\n[OK] Training completed.")
+        print("-" * 65)
+        print(f"{'Category':<15} {'Precision':<10} {'Recall':<10} {'F1-Score':<10} {'Support':<10}")
+        print("-" * 65)
+        
+        report = res.get('report', {})
+        for category, metrics in report.items():
+            if category in ['accuracy']:
+                continue
+            
+            # Handle macro/weighted avg
+            if category in ['macro avg', 'weighted avg']:
+                cat_name = category.title()
+            else:
+                cat_name = category
+
+            p = metrics['precision']
+            r = metrics['recall']
+            f1 = metrics['f1-score']
+            s = metrics['support']
+            print(f"{cat_name:<15} {p:<10.4f} {r:<10.4f} {f1:<10.4f} {int(s):<10}")
+        
+        print("-" * 65)
+        print(f"Overall Accuracy: {res['accuracy']:.4f}")
+        print("-" * 65)
 
     # Test robustness with varied inputs
     print("\n" + "=" * 40)
