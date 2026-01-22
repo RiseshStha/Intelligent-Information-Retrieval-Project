@@ -32,5 +32,6 @@
       "f1-score": 0.8950004244121891,
       "support": 30.0
     }
-  }
+  },
+  "confusion_matrix_path": "D:\\Data Science\\Information Reterival\\Assignment\\Finall Assignments\\final task\\backend\\static\\confusion_matrix.png"
 }

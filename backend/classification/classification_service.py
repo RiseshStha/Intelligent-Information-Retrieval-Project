@@ -13,7 +13,12 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend for server environments
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Import documents from data.py
 try:
@@ -70,6 +75,61 @@ class ClassificationService:
             print(f"[Classification] Error loading models: {e}")
             return False
 
+    def plot_confusion_matrix(self, y_true, y_pred, save_path=None):
+        """
+        Generate and save a confusion matrix plot.
+        
+        Args:
+            y_true: True labels
+            y_pred: Predicted labels
+            save_path: Path to save the plot (optional)
+        
+        Returns:
+            Path to saved plot or None
+        """
+        try:
+            # Generate confusion matrix
+            cm = confusion_matrix(y_true, y_pred, labels=self.label_classes)
+            
+            # Create figure with appropriate size
+            plt.figure(figsize=(10, 8))
+            
+            # Create heatmap with annotations
+            sns.heatmap(
+                cm,
+                annot=True,
+                fmt='d',
+                cmap='Blues',
+                xticklabels=self.label_classes,
+                yticklabels=self.label_classes,
+                cbar_kws={'label': 'Count'},
+                square=True
+            )
+            
+            plt.title('Confusion Matrix - Document Classification', fontsize=16, fontweight='bold', pad=20)
+            plt.ylabel('True Label', fontsize=12, fontweight='bold')
+            plt.xlabel('Predicted Label', fontsize=12, fontweight='bold')
+            plt.xticks(rotation=45, ha='right')
+            plt.yticks(rotation=0)
+            plt.tight_layout()
+            
+            # Save plot
+            if save_path is None:
+                save_path = self.static_dir / 'confusion_matrix.png'
+            else:
+                save_path = Path(save_path)
+            
+            plt.savefig(save_path, dpi=300, bbox_inches='tight')
+            plt.close()
+            
+            print(f"[Classification] Confusion matrix saved to: {save_path}")
+            return str(save_path)
+            
+        except Exception as e:
+            print(f"[Classification] Error plotting confusion matrix: {e}")
+            plt.close()
+            return None
+
     def train_from_dataframe(self, df: pd.DataFrame, text_col='text', label_col='category'):
         df = df.dropna(subset=[text_col, label_col])
         df['clean_text'] = df[text_col].apply(self._preprocess)
@@ -101,7 +161,14 @@ class ClassificationService:
         acc = accuracy_score(y_test, y_pred)
         report = classification_report(y_test, y_pred, output_dict=True)
 
-        metrics = {'accuracy': float(acc), 'report': report}
+        # Generate and save confusion matrix
+        cm_path = self.plot_confusion_matrix(y_test, y_pred)
+
+        metrics = {
+            'accuracy': float(acc),
+            'report': report,
+            'confusion_matrix_path': cm_path
+        }
         with open(self.data_dir / 'classification_metrics.json', 'w') as f:
             json.dump(metrics, f, indent=2)
 
