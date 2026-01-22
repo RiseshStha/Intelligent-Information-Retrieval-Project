@@ -86,38 +86,38 @@ const ClassificationPage = () => {
                 </div>
             </nav>
 
-            <div className="max-w-5xl mx-auto px-6 py-12">
-                <div className="text-center mb-12">
-                    <h2 className="text-4xl font-bold text-slate-900 mb-4">
+            <div className="max-w-5xl mx-auto px-6 py-6">
+                <div className="text-center mb-6">
+                    <h2 className="text-3xl font-bold text-slate-900 mb-2">
                         Document Classification
                     </h2>
-                    <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                    <p className="text-base text-slate-600 max-w-2xl mx-auto">
                         Enter a document and the Naïve Bayes classifier will predict its category.
                     </p>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-slate-200">
-                    <label className="block text-sm font-semibold text-slate-700 mb-3">Enter Document Text</label>
+                <div className="bg-white rounded-2xl shadow-xl p-6 mb-6 border border-slate-200">
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Enter Document Text</label>
                     <textarea
                         value={inputText}
                         onChange={(e) => setInputText(e.target.value)}
                         placeholder="Type or paste your text here..."
-                        className="w-full h-40 px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                        className="w-full h-24 px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
                     />
 
-                    <div className="flex items-center justify-between mt-6">
-                        <div className="text-sm text-slate-500">{inputText.length} characters</div>
+                    <div className="flex items-center justify-between mt-4">
+                        <div className="text-xs text-slate-500">{inputText.length} characters</div>
                         <div className="flex space-x-3">
                             <button
                                 onClick={() => { setInputText(''); setPrediction(null); setError(null); }}
-                                className="px-6 py-2.5 bg-slate-100 text-slate-700 rounded-lg"
+                                className="px-5 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
                             >
                                 Clear
                             </button>
                             <button
                                 onClick={handlePredict}
                                 disabled={loading || !inputText.trim()}
-                                className="px-8 py-2.5 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg disabled:opacity-50"
+                                className="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg font-medium text-sm shadow-md hover:shadow-lg transition-all disabled:opacity-50"
                             >
                                 {loading ? 'Classifying...' : 'Classify Document'}
                             </button>
@@ -126,48 +126,57 @@ const ClassificationPage = () => {
                 </div>
 
                 {error && (
-                    <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-8 rounded-lg">
-                        <div className="flex items-center"><span className="text-red-600 font-medium">❌ {error}</span></div>
+                    <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-lg">
+                        <div className="flex items-center"><span className="text-red-600 font-medium text-sm">❌ {error}</span></div>
                     </div>
                 )}
 
                 {prediction && !prediction.error && (
-                    <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-slate-200">
-                        <h3 className="text-2xl font-bold text-slate-900 mb-6">Classification Result</h3>
-                        <div className="p-6 rounded-xl border-2 mb-6 bg-slate-50 border-slate-200">
-                            <div className="text-sm font-medium opacity-75">Predicted Category</div>
-                            <div className="text-4xl font-bold mt-2">{prediction.category}</div>
-                            <div className="text-sm text-slate-500 mt-2">Confidence: {(prediction.confidence || 0).toFixed(4)}</div>
-                        </div>
-
-                        {prediction.probabilities && (
-                            <div>
-                                <h4 className="text-lg font-semibold text-slate-700 mb-3">Class Probabilities</h4>
-                                <div className="flex gap-3">
-                                    {Object.entries(prediction.probabilities).map(([cat, p]) => (
-                                        <div key={cat} className="px-4 py-2 bg-slate-100 rounded-lg text-sm">
-                                            <div className="font-medium">{cat}</div>
-                                            <div className="text-slate-600">{p.toFixed(4)}</div>
-                                        </div>
-                                    ))}
-                                </div>
+                    <div className="bg-white rounded-2xl shadow-xl p-6 mb-6 border border-slate-200">
+                        <h3 className="text-lg font-bold text-slate-900 mb-4">Classification Result</h3>
+                        <div className="flex items-center gap-6">
+                            <div className="flex-1 p-4 rounded-xl border-2 bg-slate-50 border-slate-200">
+                                <div className="text-xs font-medium uppercase tracking-wide text-slate-500">Predicted Category</div>
+                                <div className="text-3xl font-bold mt-1 text-blue-700">{prediction.category}</div>
+                                <div className="text-xs text-slate-500 mt-1">Confidence: {(prediction.confidence || 0).toFixed(4)}</div>
                             </div>
-                        )}
+
+                            {prediction.probabilities && (
+                                <div className="flex-1">
+                                    <h4 className="text-sm font-semibold text-slate-700 mb-2">Class Probabilities</h4>
+                                    <div className="space-y-2">
+                                        {Object.entries(prediction.probabilities).map(([cat, p]) => (
+                                            <div key={cat} className="flex items-center justify-between text-sm">
+                                                <span className="text-slate-600">{cat}</span>
+                                                <div className="flex items-center gap-2 flex-1 mx-3">
+                                                    <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                                                        <div
+                                                            className="h-full bg-blue-500 rounded-full"
+                                                            style={{ width: `${p * 100}%` }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <span className="font-mono text-slate-700">{p.toFixed(4)}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
 
-                <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
-                    <h3 className="text-xl font-bold text-slate-900 mb-4">Try These Examples</h3>
-                    <p className="text-sm text-slate-600 mb-6">Click any example to test the classifier's robustness with varied inputs</p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white rounded-2xl shadow-xl p-6 border border-slate-200">
+                    <h3 className="text-lg font-bold text-slate-900 mb-3">Try These Examples</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         {testExamples.map((t, i) => (
                             <button
                                 key={i}
                                 onClick={() => setInputText(t)}
-                                className="p-4 rounded-xl border-2 border-slate-200 bg-slate-50 text-left hover:border-blue-300 hover:bg-blue-50 transition-all"
+                                className="p-3 rounded-xl border border-slate-200 bg-slate-50 text-left hover:border-blue-300 hover:bg-blue-50 transition-all group"
                             >
-                                <div className="font-semibold text-sm text-slate-700 mb-1">Example {i + 1}</div>
-                                <p className="text-sm text-slate-600 line-clamp-2">{t}</p>
+                                <div className="font-semibold text-xs text-slate-500 mb-1 group-hover:text-blue-600 transition-colors">Example {i + 1}</div>
+                                <p className="text-xs text-slate-700 line-clamp-2">{t}</p>
                             </button>
                         ))}
                     </div>
